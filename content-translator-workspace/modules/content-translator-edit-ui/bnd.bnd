@@ -1,4 +1,0 @@
-Bundle-Name: content-translator-edit-ui
-Bundle-SymbolicName: content.translator.edit.ui
-Bundle-Version: 1.0.0
-Fragment-Host: com.liferay.journal.web;bundle-version="1.7.2"

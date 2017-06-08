@@ -1,0 +1,12 @@
+Bundle-Name: Yandex Translator API
+Bundle-SymbolicName: com.rivetlogic.translator.yandex.api
+Bundle-Version: 1.0.0
+Export-Package:\
+	com.rivetlogic.translator.api
+Import-Package: \
+	com.google.common.*;resolution:=optional,\
+	!org.apache.http.*,\
+	!org.apache.avalon.*,\
+	!org.apache.log,\
+	!org.json.*,\
+	*

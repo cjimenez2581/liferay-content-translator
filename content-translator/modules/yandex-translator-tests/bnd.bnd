@@ -1,0 +1,4 @@
+Bundle-Name: yandex-translator-tests
+Bundle-SymbolicName: yandex.translator.tests
+Bundle-Version: 1.0.0
+Export-Package: yandex.translator.tests.api
