@@ -3,6 +3,7 @@ package yandex.translator.api.tests;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 import org.junit.BeforeClass;
@@ -24,8 +25,13 @@ public class YandexTest {
 	public void testGetLanguages(){
 		YandexTranslatorAPI yandex = new YandexTranslatorAPI();
 		yandex.setApiKey(apiKey);
-		Multimap<String, String> translations = yandex.getTranslationsList();
-		assertTrue("English to German translation doesn't apper", translations.containsEntry("en", "de") );
+		//Multimap<String, String> translations = yandex.getTranslationsList();
+		//assertTrue("English to German translation doesn't appear", translations.containsEntry("en", "de") );
+		Set<String> languages = yandex.getTranslationsList();
+		assertTrue("English doesn't appear", languages.contains("en") );
+		assertTrue("German doesn't appear", languages.contains("de") );
+		assertTrue("Hebrew doesn't appear", languages.contains("he") );
+		assertTrue("Chinese doesn't appear", languages.contains("zh") );
 	}
 	
 	@Test

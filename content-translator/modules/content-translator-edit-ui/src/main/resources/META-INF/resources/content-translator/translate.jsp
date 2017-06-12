@@ -15,14 +15,18 @@ String articleId = ParamUtil.getString(request, "articleId");
 long groupId = ParamUtil.getLong(request, "groupId");
 double version = ParamUtil.getDouble(request, "version", JournalArticleConstants.VERSION_DEFAULT);
 
-JournalArticle article = JournalArticleLocalServiceUtil.getArticle(groupId, articleId, version);
+// JournalArticle article = JournalArticleLocalServiceUtil.getArticle(groupId, articleId);
+JournalArticle article = journalDisplayContext.getArticle();
 String structureId = BeanParamUtil.getString(article, request, "structureId");
 String redirect = ParamUtil.getString(request, "redirect");
 int status = BeanParamUtil.getInteger(article, request, "status");
-pageContext.setAttribute("pns", renderResponse.getNamespace());
+if(renderResponse!=null) {
+	pageContext.setAttribute("pns", 
+			renderResponse.getNamespace());
+}
 
-boolean close = ParamUtil.getBoolean(request, "translatorClose");
-boolean disable = ParamUtil.getBoolean(request, "translatorDisable");
+boolean close = ParamUtil.getBoolean(request, com.rivetlogic.translator.ui.WebKeys.TRANSLATOR_CLOSE);
+boolean disable = ParamUtil.getBoolean(request, com.rivetlogic.translator.ui.WebKeys.TRANSLATOR_DISABLE);
 String[] articleLanguages = article.getAvailableLanguageIds();
 
 BundleContext bundleContext = FrameworkUtil.getBundle(AutomaticTranslatorUtil.class).getBundleContext();
@@ -30,9 +34,11 @@ ServiceReference<AutomaticTranslatorUtil> utilReference = bundleContext.getServi
 AutomaticTranslatorUtil automaticTranslatorUtil = (AutomaticTranslatorUtil) bundleContext.getService( utilReference );
 %>
 
-<portlet:actionURL var="translateArticleActionURL" windowState="<%= WindowState.MAXIMIZED.toString() %>">
-    <portlet:param name="struts_action" value="/journal/translate" />
-    <portlet:param name="redirect" value="<%= redirect %>" />
+<portlet:actionURL var="translateArticleActionURL" name="automaticTranslate" windowState="<%= WindowState.MAXIMIZED.toString() %>">
+	<portlet:param name="articleId" value="<%=articleId%>" />
+	<portlet:param name="groupId" value="<%=String.valueOf(groupId)%>" />
+	<portlet:param name="version" value="<%=String.valueOf(version)%>" />
+	
 </portlet:actionURL>
 
 <liferay-ui:error key="translator-error" message="translator-error-message"/>

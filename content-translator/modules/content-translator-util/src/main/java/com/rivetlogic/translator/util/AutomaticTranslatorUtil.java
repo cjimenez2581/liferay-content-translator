@@ -1,7 +1,5 @@
 package com.rivetlogic.translator.util;
 
-import java.util.Arrays;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
@@ -24,7 +22,8 @@ import com.rivetlogic.translator.configuration.ConfigurationManager;;
 		immediate = true
 )
 public class AutomaticTranslatorUtil {
-    private static final Log LOG = LogFactoryUtil.getLog(AutomaticTranslatorUtil.class);
+    @SuppressWarnings("unused")
+	private static final Log LOG = LogFactoryUtil.getLog(AutomaticTranslatorUtil.class);
 
     /**
      * Used to check if the values of the credentials in the control panel are valid.
@@ -38,12 +37,7 @@ public class AutomaticTranslatorUtil {
      * Used to get an instance of TranslatorAPI, using the credentials from the control panel.
      */
     public YandexTranslatorAPI getTranslateAPI() {
-        LOG.debug("Getting preferences from control panel");
-        
-        YandexTranslatorAPI translator = new YandexTranslatorAPI();
-        translator.setApiKey(
-        		config.getYandexApiKey() );
-        return translator;
+        return api;
     }
     
     /**
@@ -53,11 +47,11 @@ public class AutomaticTranslatorUtil {
      * @return
      */
     public boolean canTranslateTo(String targetLang, String[] baseLanguages){
+    	if( targetLang.equalsIgnoreCase("iw") )
+    		targetLang = "he";
     	for (int ii = 0; ii < baseLanguages.length; ii++) {
 			baseLanguages[ii] = baseLanguages[ii].split("_")[0];
 		}
-    	System.out.println("Can translate to "+targetLang+" from "+Arrays.toString(baseLanguages)+"?\n"
-    			+ getTranslateAPI().canTranslateTo(targetLang, baseLanguages));
     	return getTranslateAPI().canTranslateTo(targetLang, baseLanguages);
     }
     
@@ -76,6 +70,9 @@ public class AutomaticTranslatorUtil {
 	)
     public synchronized void setConfig(ConfigurationManager config){
     	this.config = config;
+    	if( api!=null && config != null){
+			api.setApiKey( config.getYandexApiKey() );
+		}
     }
     
     public synchronized void unsetConfig(ConfigurationManager config){
@@ -84,5 +81,25 @@ public class AutomaticTranslatorUtil {
         }
     }
     
+    @Reference(
+    		service = YandexTranslatorAPI.class,
+    		cardinality = ReferenceCardinality.MANDATORY,
+    		policy = ReferencePolicy.STATIC,
+    		unbind = "unsetYandexTranslatorAPI"
+	)
+    public synchronized void setYandexTranslatorAPI(YandexTranslatorAPI api){
+    	this.api = api;
+    	if( api!=null && config != null){
+			api.setApiKey( config.getYandexApiKey() );
+		}
+    }
+    
+    public synchronized void unsetYandexTranslatorAPI(YandexTranslatorAPI api){
+    	if (this.api == api) {
+            this.api= null;
+        }
+    }
+    
+    private YandexTranslatorAPI api;
     private ConfigurationManager config;
 }

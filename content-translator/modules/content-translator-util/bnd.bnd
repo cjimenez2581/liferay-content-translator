@@ -1,7 +1,10 @@
 Bundle-Name: Content Translator Util
 Bundle-SymbolicName: com.rivetlogic.translator.util
 Bundle-Version: 1.0.0
-Export-Package: com.rivetlogic.translator.util
+Export-Package: \
+	com.rivetlogic.translator.action,\
+	com.rivetlogic.translator.util,\
+	com.rivetlogic.translator.ui
 Import-Package: \
 	com.google.common.*,\
 	org.osgi.service.component.*,\

@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpResponse;
@@ -19,6 +21,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.osgi.service.component.annotations.Component;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
@@ -28,6 +31,10 @@ import com.google.common.collect.Multimap;
 /**
  * @author emmanuelabarca
  */
+@Component(
+		service = YandexTranslatorAPI.class,
+		immediate = true
+)
 public class YandexTranslatorAPI {
 	private static final String ENCODING = "UTF-8";
 	private static final String BASE_URL = "https://translate.yandex.net/api/v1.5/tr.json";
@@ -35,21 +42,21 @@ public class YandexTranslatorAPI {
 	private static final String TRANSLATE_PATH = "/translate";
 
 	protected String apiKey;
-	private final Supplier<Multimap<String, String>> translationsMap =
+	private final Supplier<Set<String>> translationsMap =
 			Suppliers.memoizeWithExpiration(translationsListSupplier(), 12, TimeUnit.HOURS);
 
 	/**
 	 * A map where the key represents the source language and value the target language
 	 * @return null if there was an error
 	 */
-	public Multimap<String, String> getTranslationsList(){
+	public Set<String> getTranslationsList(){
 		return translationsMap.get();
 	}
 
-	private Supplier<Multimap<String, String>> translationsListSupplier(){
-		return new Supplier<Multimap<String, String>>() {
+	private Supplier<Set<String>> translationsListSupplier(){
+		return new Supplier<Set<String>>() {
 			@Override
-			public Multimap<String, String> get() {
+			public Set<String> get() {
 				try {
 					URI getLanguagesURI = new URIBuilder(BASE_URL + GET_LANGUAGES_PATH)
 							.build()
@@ -61,13 +68,20 @@ public class YandexTranslatorAPI {
 					JSONObject response = postRequest(getLanguagesURI, arguments);
 					JSONArray translationPairsJSON = (JSONArray) response.get("dirs");
 					Multimap<String, String> translations = HashMultimap.create();
+					Set<String> languages = new HashSet<>();
 					for(Object obj : translationPairsJSON){
 						String str = (String) obj;
 						String[] parts = str.split("-");
 						translations.put( parts[0], parts[1] );
 					}
+					
+					JSONObject languagesJSON = (JSONObject) response.get("langs");
+					for( Object obj : languagesJSON.keySet() ){
+						String str = (String) obj;
+						languages.add( str );
+					}
 
-					return translations;
+					return languages;
 				} catch (URISyntaxException e) {
 					e.printStackTrace();
 					return null;
@@ -85,6 +99,10 @@ public class YandexTranslatorAPI {
 	 * @throws Exception on error.
 	 */
 	public String translate(String text, String from, String to) throws TranslatorException{
+		if(text==null)
+			return null;
+		if(text.trim().isEmpty())
+			return text;
 		try {
 			URI translateURI = new URIBuilder(BASE_URL + TRANSLATE_PATH)
 					.build()
@@ -99,7 +117,7 @@ public class YandexTranslatorAPI {
 			if(response.containsKey("code")) {
 				long code = (long) response.get("code");
 				if (code!=200) {
-					throw new TranslatorException("[yandex-translator-api] Error retrieving translation, probably the specified translation direction is not supported ");
+					throw new TranslatorException("[yandex-translator-api] "+code+": Error retrieving translation, probably the specified translation direction is not supported. ");
 				}
 			}
 			JSONArray translations = (JSONArray) response.get("text");
@@ -111,13 +129,14 @@ public class YandexTranslatorAPI {
 	}
 	
 	public boolean canTranslateTo(String targetLang, String[] baseLanguages){
-    	Multimap<String, String> translationMap = getTranslationsList();
-    	for (String lang : baseLanguages) {
+		Set<String> translationMap = getTranslationsList();
+    	/*for (String lang : baseLanguages) {
 			if(translationMap.containsEntry(lang, targetLang)) {
 				return true;
 			}
 		}
-    	return false;
+    	return false;*/
+		return translationMap.contains(targetLang);
     }
 
 	protected JSONObject postRequest(URI uri, List<NameValuePair> arguments){
