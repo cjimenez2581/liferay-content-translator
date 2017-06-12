@@ -1,2 +1,2 @@
 # liferay-content-translator
-Automatic web content translator built on MS Translator API.
+Automatic web content translator built on Yandex Translate API.
