@@ -79,9 +79,6 @@ public class AutomaticTranslatorRender implements MVCRenderCommand {
             renderRequest.setAttribute(WebKeys.TRANSLATOR_DISABLE, true);
         }
         
-        System.out.println("***");
-        System.out.println("Rendering");
-        System.out.println("***");
         return "/content-translator/translate.jsp";
 	}
 

@@ -27,7 +27,15 @@ if(renderResponse!=null) {
 
 boolean close = ParamUtil.getBoolean(request, com.rivetlogic.translator.ui.WebKeys.TRANSLATOR_CLOSE);
 boolean disable = ParamUtil.getBoolean(request, com.rivetlogic.translator.ui.WebKeys.TRANSLATOR_DISABLE);
-String[] articleLanguages = article.getAvailableLanguageIds();
+String[] articleLanguages = new String[0];
+if(article!=null){
+	article.getAvailableLanguageIds();
+} else {
+%>
+<p><liferay-ui:message key="save-a-version-first" /></p>
+<%
+	return;
+}
 
 BundleContext bundleContext = FrameworkUtil.getBundle(AutomaticTranslatorUtil.class).getBundleContext();
 ServiceReference<AutomaticTranslatorUtil> utilReference = bundleContext.getServiceReference(AutomaticTranslatorUtil.class );
