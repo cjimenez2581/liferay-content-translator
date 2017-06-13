@@ -1,6 +1,9 @@
 Bundle-Name: Content Translator Configuration
 Bundle-SymbolicName: com.rivetlogic.translator.configuration
 Bundle-Version: 1.0.0
+Require-Capability:\
+	liferay.resource.bundle;\
+		filter:="(bundle.symbolic.name=com.rivetlogic.translator.lang)"
 Export-Package:\
 	com.rivetlogic.translator.configuration
 -metatype: *
