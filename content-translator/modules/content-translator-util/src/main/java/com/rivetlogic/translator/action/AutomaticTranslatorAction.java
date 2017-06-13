@@ -161,9 +161,11 @@ public class AutomaticTranslatorAction extends BaseMVCActionCommand {
                         LOG.debug("NewFields num: "+newFields.getNames().size());
                         
                         Fields mergedFields = existingFields;
-                        if( newFields.getNames().size()>0 ) {
+                        if( newFields.getNames().size()>0 ) try {
                         	mergedFields = DDMUtil.mergeFields( //TODO current exception
                         		newFields, existingFields);
+                        } catch(Exception e){
+                        	LOG.warn("Error merging fields", e);
                         }
         
                         content = _journalConverter.getContent(
