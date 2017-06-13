@@ -47,6 +47,7 @@ import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.rivetlogic.translator.api.TranslatorException;
+import com.rivetlogic.translator.api.TranslatorException.Type;
 import com.rivetlogic.translator.api.YandexTranslatorAPI;
 import com.rivetlogic.translator.ui.WebKeys;
 import com.rivetlogic.translator.util.AutomaticTranslatorUtil;
@@ -156,7 +157,7 @@ public class AutomaticTranslatorAction extends BaseMVCActionCommand {
                         Fields existingFields = _journalConverter.getDDMFields(
                             ddmStructure, article.getContent());
                         LOG.debug(serviceContext);
-                        LOG.debug("NewFields: "+newFields.getNames()); // TODO Empty
+                        LOG.debug("NewFields: "+newFields.getNames());
                         LOG.debug("ExistingFields: "+existingFields.getNames());
                         LOG.debug("NewFields num: "+newFields.getNames().size());
                         
@@ -202,7 +203,11 @@ public class AutomaticTranslatorAction extends BaseMVCActionCommand {
             actionResponse.setRenderParameter(WebKeys.TRANSLATOR_CLOSE, "true");
             actionResponse.setRenderParameter("mvcPath", "/content-translator/translate.jsp");
         } catch(TranslatorException e) {
-            SessionErrors.add(actionRequest, WebKeys.TRANSLATOR_ERROR_KEY);
+        	if(e.getType() == Type.API_AUTH){
+        		SessionErrors.add(actionRequest, WebKeys.TRANSLATOR_AUTH_ERROR);
+        	} else {
+        		SessionErrors.add(actionRequest, WebKeys.TRANSLATOR_ERROR_KEY);
+        	}
             LOG.error(e.getMessage());
         }
 		

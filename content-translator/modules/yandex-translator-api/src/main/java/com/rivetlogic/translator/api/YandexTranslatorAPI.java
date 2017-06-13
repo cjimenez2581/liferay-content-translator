@@ -27,6 +27,7 @@ import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import com.rivetlogic.translator.api.TranslatorException.Type;
 
 /**
  * @author emmanuelabarca
@@ -116,15 +117,17 @@ public class YandexTranslatorAPI {
 			JSONObject response = postRequest(translateURI, arguments);
 			if(response.containsKey("code")) {
 				long code = (long) response.get("code");
-				if (code!=200) {
-					throw new TranslatorException("[yandex-translator-api] "+code+": Error retrieving translation, probably the specified translation direction is not supported. ");
+				if( code==401 ) {
+					throw new TranslatorException(Type.API_AUTH, "[yandex-translator-api] "+code+": "+ response.getOrDefault("message", "Probably api key auth error.").toString() );
+				}else if( code!=200 ){
+					throw new TranslatorException(Type.UNSUPPORTED, "[yandex-translator-api] "+code+": Error retrieving translation, probably the specified translation direction is not supported. ");
 				}
 			}
 			JSONArray translations = (JSONArray) response.get("text");
 
 			return (String) translations.get(0);
 		} catch (URISyntaxException ex) {
-			throw new TranslatorException("[yandex-translator-api] Error retrieving translation : " + ex.getMessage(), ex);
+			throw new TranslatorException(Type.BAD_FORMAT, "[yandex-translator-api] Error retrieving translation : " + ex.getMessage(), ex);
 		}
 	}
 	

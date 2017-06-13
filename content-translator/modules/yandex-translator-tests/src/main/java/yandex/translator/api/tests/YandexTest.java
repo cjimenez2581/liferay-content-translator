@@ -3,6 +3,7 @@ package yandex.translator.api.tests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,6 +14,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.rivetlogic.translator.api.TranslatorException;
+import com.rivetlogic.translator.api.TranslatorException.Type;
 import com.rivetlogic.translator.api.YandexTranslatorAPI;
 
 public class YandexTest {
@@ -37,14 +39,23 @@ public class YandexTest {
 	}
 	
 	@Test
-	public void testTranslateEnDeHTML(){
+	public void testTranslateEnDeHTML() throws TranslatorException{
 		YandexTranslatorAPI yandex = new YandexTranslatorAPI();
 		yandex.setApiKey(apiKey);
-		try {
-			String translation = yandex.translate("<section>\n<span><a>milk</a></span>\n</section>", "en", "de");
-			assertEquals("Failed translating english to german with HTML", "<section>\n<span><a>Milch</a></span>\n</section>", translation);
-		} catch (Exception e) {
-			e.printStackTrace();
+		String translation = yandex.translate("<section>\n<span><a>milk</a></span>\n</section>", "en", "de");
+		assertEquals("Failed translating english to german with HTML", "<section>\n<span><a>Milch</a></span>\n</section>", translation);
+	}
+	
+	@Test
+	public void testBadAuth(){
+		YandexTranslatorAPI yandex = new YandexTranslatorAPI();
+		yandex.setApiKey("a");
+		try{
+			@SuppressWarnings("unused")
+			String translation = yandex.translate("text", "en", "xyz");
+			fail("Should have failed with a bad api key");
+		} catch(TranslatorException e) {
+			assertEquals("Should have failed with a bad api key", Type.API_AUTH, e.getType());
 		}
 	}
 	
