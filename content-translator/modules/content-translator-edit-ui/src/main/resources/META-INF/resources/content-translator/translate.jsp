@@ -46,7 +46,6 @@ AutomaticTranslatorUtil automaticTranslatorUtil = (AutomaticTranslatorUtil) bund
 	<portlet:param name="articleId" value="<%=articleId%>" />
 	<portlet:param name="groupId" value="<%=String.valueOf(groupId)%>" />
 	<portlet:param name="version" value="<%=String.valueOf(version)%>" />
-	
 </portlet:actionURL>
 
 <liferay-ui:error key="translator-error" message="translator-error-message"/>
@@ -80,13 +79,13 @@ AutomaticTranslatorUtil automaticTranslatorUtil = (AutomaticTranslatorUtil) bund
         }
     }
     %>
-    </aui:field-wrapper>
     
-    <aui:button-row>
-	    <aui:button name="saveButton" type="submit" value="continue" disabled="<%= disable %>" />
-	    <aui:button href="<%= redirect %>" type="cancel" />
-    </aui:button-row>
-    <span>Powered by <a href="http://translate.yandex.com/">Yandex.Translate</a></span>
+		<aui:button-row>
+			<aui:button name="saveButton" type="submit" value="continue" disabled="<%= disable %>" />
+		    <aui:button href="<%= redirect %>" type="cancel" />
+		</aui:button-row>
+		<span>Powered by <a href="http://translate.yandex.com/">Yandex.Translate</a></span>
+    </aui:field-wrapper>
 </aui:form>
 
 <% if(close) {  %>

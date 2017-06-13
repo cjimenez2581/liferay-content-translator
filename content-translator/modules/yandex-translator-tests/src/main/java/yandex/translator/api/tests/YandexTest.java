@@ -1,15 +1,17 @@
 package yandex.translator.api.tests;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Set;
 
-import static org.junit.Assert.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.google.common.collect.Multimap;
 import com.rivetlogic.translator.api.TranslatorException;
 import com.rivetlogic.translator.api.YandexTranslatorAPI;
 

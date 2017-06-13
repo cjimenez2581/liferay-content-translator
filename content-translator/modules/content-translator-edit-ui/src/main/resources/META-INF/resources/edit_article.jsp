@@ -232,11 +232,17 @@ request.setAttribute("edit_article.jsp-changeStructure", changeStructure);
 		<%
 			String taglibEditURL = "javascript:Liferay.Util.openWindow({"+
 				"cache: false,"+
-				"dialog:{width: 350, height: 450},"+
+				"dialog:{" +
+					"width: 350," +
+					"height: 450," +
+					"on: {" +
+						"visibleChange: function(e) { if(!e.newVal) window.location.reload(); }," +
+					"}," +
+				"},"+
 				"id: '" + renderResponse.getNamespace() + "automatic-translate',"+
-				"title: '" + HtmlUtil.escapeJS( LanguageUtil.get(request, "web-content-translation") ) +
-				"', uri: '" + HtmlUtil.escapeJS( translateArticleRenderPopUpURL ) +
-			"'});"; 
+				"title: '" + HtmlUtil.escapeJS( LanguageUtil.get(request, "web-content-translation") ) + "'," +
+				"uri: '" + HtmlUtil.escapeJS( translateArticleRenderPopUpURL ) + "'," +
+			"});"; 
 		%>
 		
 		<aui:button icon="icon-plus"
