@@ -105,7 +105,6 @@ public class AutomaticTranslatorAction extends BaseMVCActionCommand {
         LOG.debug("Content: " + content);
         
         Map<String, byte[]> images = new HashMap<String, byte[]>();
-        YandexTranslatorAPI translateUtil = automaticTranslatorUtil.getTranslateAPI();
         LOG.debug(defaultLanguageId);
         LOG.debug(Arrays.toString(toLanguageIds));
         try {
@@ -114,11 +113,11 @@ public class AutomaticTranslatorAction extends BaseMVCActionCommand {
                 LOG.debug("Version: " + version);
                 
                 LOG.debug("Translate: " + title + " from: " + defaultLocale.getLanguage() + " to: " + locale.getLanguage());
-                String newTitle = translateUtil.translate(title, defaultLocale.getLanguage(), locale.getLanguage());
+                String newTitle = automaticTranslatorUtil.translate(title, defaultLocale.getLanguage(), locale.getLanguage());
                 LOG.debug("Result: " + newTitle);
                 
                 LOG.debug("Translate: " + description + " from: " + defaultLocale.getLanguage() + " to: " + locale.getLanguage());
-                String newDescription = translateUtil.translate(description, defaultLocale.getLanguage(), locale.getLanguage());
+                String newDescription = automaticTranslatorUtil.translate(description, defaultLocale.getLanguage(), locale.getLanguage());
                 LOG.debug("Result: " + newDescription);
                 
                 if (Validator.isNull(structureId)) {
@@ -135,7 +134,7 @@ public class AutomaticTranslatorAction extends BaseMVCActionCommand {
                         Element staticContentElement = staticContentElements.get(0);
                         curContent = article.getContent();
                         LOG.debug("Translate: " + staticContentElement.getText() + " from: " + defaultLocale.getLanguage() + " to: " + locale.getLanguage());
-                        String newContent = translateUtil.translate(staticContentElement.getText(), defaultLocale.getLanguage(), locale.getLanguage());
+                        String newContent = automaticTranslatorUtil.translate(staticContentElement.getText(), defaultLocale.getLanguage(), locale.getLanguage());
                         LOG.debug("Result: " + newContent);
                         
                         content = LocalizationUtil.updateLocalization(
@@ -179,7 +178,7 @@ public class AutomaticTranslatorAction extends BaseMVCActionCommand {
                             if(field.getType().contains("text")) {
                                 String currValue = String.valueOf(field.getValue(defaultLocale));
                                 LOG.debug("Field Value: " + currValue);
-                                String newValue = translateUtil.translate(currValue, defaultLocale.getLanguage(), locale.getLanguage());
+                                String newValue = automaticTranslatorUtil.translate(currValue, defaultLocale.getLanguage(), locale.getLanguage());
                                 field.setValue(locale, newValue);
                                 LOG.debug("Field new Value: " + newValue);
                             }

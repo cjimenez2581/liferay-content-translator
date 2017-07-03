@@ -8,6 +8,7 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.rivetlogic.translator.api.TranslatorException;
 import com.rivetlogic.translator.api.YandexTranslatorAPI;
 import com.rivetlogic.translator.configuration.ConfigurationManager;;
 
@@ -38,6 +39,20 @@ public class AutomaticTranslatorUtil {
      */
     public YandexTranslatorAPI getTranslateAPI() {
         return api;
+    }
+    
+    /**
+     * 
+     * @param text
+     * @param from
+     * @param to Hebrew will be corrected from "iw" to "he", as liferay uses "iw"
+     * @return
+     * @throws TranslatorException
+     */
+    public String translate(String text, String from, String to) throws TranslatorException{
+    	if( to.equalsIgnoreCase("iw") )
+    		to = "he";
+    	return api.translate(text, from, to);
     }
     
     /**
