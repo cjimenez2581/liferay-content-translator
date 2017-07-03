@@ -3,6 +3,7 @@ package yandex.translator.api.tests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
 import java.io.BufferedReader;
@@ -36,6 +37,7 @@ public class YandexTest {
 		assertTrue("German doesn't appear", languages.contains("de") );
 		assertTrue("Hebrew doesn't appear", languages.contains("he") );
 		assertTrue("Chinese doesn't appear", languages.contains("zh") );
+		assertFalse("Gibberish appears", languages.contains("Gibberish") );
 	}
 	
 	@Test
