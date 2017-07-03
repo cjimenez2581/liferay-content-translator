@@ -70,14 +70,14 @@ public class AutomaticTranslatorUtil {
 	)
     public synchronized void setConfig(ConfigurationManager config){
     	this.config = config;
-    	if( api!=null && config != null){
-			api.setApiKey( config.getYandexApiKey() );
-		}
+    	LOG.info("Config is set "+this.config);
+    	refreshApiKey();
     }
     
     public synchronized void unsetConfig(ConfigurationManager config){
     	if (this.config == config) {
             this.config = null;
+            LOG.info("Config is unset "+this.config);
         }
     }
     
@@ -89,15 +89,22 @@ public class AutomaticTranslatorUtil {
 	)
     public synchronized void setYandexTranslatorAPI(YandexTranslatorAPI api){
     	this.api = api;
-    	if( api!=null && config != null){
-			api.setApiKey( config.getYandexApiKey() );
-		}
+    	LOG.info("Yandex API is set "+this.api);
+    	refreshApiKey();
     }
     
     public synchronized void unsetYandexTranslatorAPI(YandexTranslatorAPI api){
     	if (this.api == api) {
-            this.api= null;
+            this.api = null;
+            LOG.info("Yandex API is unset "+this.api);
         }
+    }
+    
+    public synchronized void refreshApiKey() {
+    	if( this.api!=null && this.config != null){
+			this.api.setApiKey( this.config.getYandexApiKey() );
+			//LOG.info("Yandex API key="+this.api.getApiKey());
+		}
     }
     
     private YandexTranslatorAPI api;

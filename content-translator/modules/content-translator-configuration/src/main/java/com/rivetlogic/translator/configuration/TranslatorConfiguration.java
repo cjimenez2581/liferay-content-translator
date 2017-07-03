@@ -18,6 +18,7 @@ import aQute.bnd.annotation.metatype.Meta;
 public interface TranslatorConfiguration {
 
     @Meta.AD(
+    	required = false,
         name = "translator.configuration.yandex.api.name",
         description = "translator.configuration.yandex.api.desc"
     )

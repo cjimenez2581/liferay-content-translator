@@ -69,13 +69,13 @@ public class YandexTranslatorAPI {
 					JSONObject response = postRequest(getLanguagesURI, arguments);
 					JSONArray translationPairsJSON = (JSONArray) response.get("dirs");
 					Multimap<String, String> translations = HashMultimap.create();
-					Set<String> languages = new HashSet<>();
 					for(Object obj : translationPairsJSON){
 						String str = (String) obj;
 						String[] parts = str.split("-");
 						translations.put( parts[0], parts[1] );
 					}
 					
+					Set<String> languages = new HashSet<>();
 					JSONObject languagesJSON = (JSONObject) response.get("langs");
 					for( Object obj : languagesJSON.keySet() ){
 						String str = (String) obj;

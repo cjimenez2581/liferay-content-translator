@@ -9,7 +9,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 
 @Component(
-		configurationPid = "com.rivetlogic.Translator",
+		configurationPid = "com.rivetlogic.translator.configuration.TranslatorConfiguration",
 		service = ConfigurationManager.class,
 		immediate = true
 )
