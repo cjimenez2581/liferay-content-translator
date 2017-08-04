@@ -230,7 +230,7 @@ request.setAttribute("edit_article.jsp-changeStructure", changeStructure);
 		</portlet:renderURL>
 		
 		<%
-			String taglibEditURL = "javascript:Liferay.Util.openWindow({"+
+		/*	String taglibEditURL = "javascript:Liferay.Util.openWindow({"+
 				"cache: false,"+
 				"dialog:{" +
 					"width: 350," +
@@ -242,13 +242,13 @@ request.setAttribute("edit_article.jsp-changeStructure", changeStructure);
 				"id: '" + renderResponse.getNamespace() + "automatic-translate',"+
 				"title: '" + HtmlUtil.escapeJS( LanguageUtil.get(request, "web-content-translation") ) + "'," +
 				"uri: '" + HtmlUtil.escapeJS( translateArticleRenderPopUpURL ) + "'," +
-			"});"; 
+			"});";  */
 		%>
 		
 		<aui:button icon="icon-plus"
 			name="addAutomaticTranslation"
 			value="<%=LanguageUtil.get(request, "add-automatic-translation")%>"
-			onClick="<%=taglibEditURL%>" />
+			cssClass="automatic-translation-btn" />
 
 		<!-- Rivet customization end -->
 
@@ -379,4 +379,37 @@ request.setAttribute("edit_article.jsp-changeStructure", changeStructure);
 			'strings.saveAsDraftBeforePreview': '<liferay-ui:message key="in-order-to-preview-your-changes,-the-web-content-is-saved-as-a-draft" />'
 		}
 	);
+	
+	<!-- Rivet customization start -->
+	
+	var automaticTranslationBtn= A.one(".automatic-translation-btn");
+	automaticTranslationBtn.on('click', function(){
+		
+	var selectedLangIds='';
+	A.all('.lfr-translation-manager-translation').each(
+	  function (node) {
+	    if (node.getAttribute('locale') !== "") {
+	    	selectedLangIds = selectedLangIds+node.getAttribute('locale')+",";
+	    }
+	  }
+	);
+	console.log("selected Lang ->" + selectedLangIds);
+	new Liferay.Util.openWindow(
+		{
+		cache: false,
+		dialog:{
+			width: 350,
+			height: 450,
+			on: {
+				visibleChange: function(e) { if(!e.newVal) window.location.reload(); }
+			},
+		},
+		id: '<portlet:namespace/>automatic-translate',
+		title: '<%=HtmlUtil.escapeJS( LanguageUtil.get(request, "web-content-translation") )%>',
+		uri: '${translateArticleRenderPopUpURL}'+'&<portlet:namespace/>selectedLangIds='+selectedLangIds, 
+	});
+	});
+	
+	<!-- Rivet customization end -->
+	
 </aui:script>
