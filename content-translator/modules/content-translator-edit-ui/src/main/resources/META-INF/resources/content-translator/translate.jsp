@@ -19,6 +19,12 @@ double version = ParamUtil.getDouble(request, "version", JournalArticleConstants
 JournalArticle article = journalDisplayContext.getArticle();
 String structureId = BeanParamUtil.getString(article, request, "structureId");
 String redirect = ParamUtil.getString(request, "redirect");
+
+// Get selected languageIds
+String selectedLangIds = ParamUtil.getString(request,"selectedLangIds");
+// Append default languageId
+selectedLangIds = selectedLangIds+StringPool.COMMA+article.getDefaultLanguageId();
+
 int status = BeanParamUtil.getInteger(article, request, "status");
 if(renderResponse!=null) {
 	pageContext.setAttribute("pns", 
@@ -61,9 +67,9 @@ AutomaticTranslatorUtil automaticTranslatorUtil = (AutomaticTranslatorUtil) bund
     <aui:field-wrapper name="selectedLanguages" label="journal.article.form.translate.select.language">
     <%
     Set<Locale> locales = LanguageUtil.getAvailableLocales(themeDisplay.getSiteGroupId());
-	
+    
     for (Locale iiLocale : locales) {
-        if (!ArrayUtil.contains(article.getAvailableLanguageIds(), LocaleUtil.toLanguageId(iiLocale)) &&
+        if (!(selectedLangIds.indexOf(LocaleUtil.toLanguageId(iiLocale))>=0) &&
         		 automaticTranslatorUtil.canTranslateTo( LocaleUtil.toLanguageId(iiLocale).split("_")[0], articleLanguages) ) {
             
     %>
