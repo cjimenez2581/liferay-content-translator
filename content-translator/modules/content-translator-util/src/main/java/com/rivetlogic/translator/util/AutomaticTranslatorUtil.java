@@ -31,13 +31,14 @@ public class AutomaticTranslatorUtil {
      */
     public boolean validateCredentials() {
         String apiKey = getAPIKey();
-        return !apiKey.equals(StringPool.BLANK) && !apiKey.equals("CLIENT_ID");
+        return apiKey!=null && !apiKey.trim().equals(StringPool.BLANK) && !apiKey.equals("CLIENT_ID");
     }
     
     /**
      * Used to get an instance of TranslatorAPI, using the credentials from the control panel.
      */
-    public YandexTranslatorAPI getTranslateAPI() {
+    protected YandexTranslatorAPI getTranslateAPI() {
+    	refreshApiKey();
         return api;
     }
     
@@ -50,9 +51,10 @@ public class AutomaticTranslatorUtil {
      * @throws TranslatorException
      */
     public String translate(String text, String from, String to) throws TranslatorException{
+    	refreshApiKey();
     	if( to.equalsIgnoreCase("iw") )
     		to = "he";
-    	return api.translate(text, from, to);
+    	return getTranslateAPI().translate(text, from, to);
     }
     
     /**
@@ -74,6 +76,7 @@ public class AutomaticTranslatorUtil {
      * Get the value for ClientId from the control panel
      */
     private String getAPIKey() {
+    	refreshApiKey();
         return config.getYandexApiKey();
     }
     
@@ -118,7 +121,6 @@ public class AutomaticTranslatorUtil {
     public synchronized void refreshApiKey() {
     	if( this.api!=null && this.config != null){
 			this.api.setApiKey( this.config.getYandexApiKey() );
-			//LOG.info("Yandex API key="+this.api.getApiKey());
 		}
     }
     

@@ -48,58 +48,62 @@ ServiceReference<AutomaticTranslatorUtil> utilReference = bundleContext.getServi
 AutomaticTranslatorUtil automaticTranslatorUtil = (AutomaticTranslatorUtil) bundleContext.getService( utilReference );
 %>
 
-<portlet:actionURL var="translateArticleActionURL" name="automaticTranslate" windowState="<%= WindowState.MAXIMIZED.toString() %>">
-	<portlet:param name="articleId" value="<%=articleId%>" />
-	<portlet:param name="groupId" value="<%=String.valueOf(groupId)%>" />
-	<portlet:param name="version" value="<%=String.valueOf(version)%>" />
-</portlet:actionURL>
-
-<liferay-ui:error key="translator-error" message="translator-error-message"/>
-<liferay-ui:error key="translator-auth-error" message="translator-auth-error-message"/>
-
-<aui:form action="<%= translateArticleActionURL %>" cssClass="lfr-dynamic-form" enctype="multipart/form-data" method="post" name="fm1">
-    <aui:input name="articleId" type="hidden" value="<%= articleId %>" />
-    <aui:input name="groupId" type="hidden" value="<%= groupId %>" />
-    <aui:input name="version" type="hidden" value="<%= ((article == null) || article.isNew()) ? version : article.getVersion() %>" />
-    <aui:input name="status" type="hidden" value="<%= status %>" />
-    <aui:input name="structureId" type="hidden" value="<%= structureId %>" />
-    
-    <aui:field-wrapper name="selectedLanguages" label="journal.article.form.translate.select.language">
-    <%
-    Set<Locale> locales = LanguageUtil.getAvailableLocales(themeDisplay.getSiteGroupId());
-    
-    for (Locale iiLocale : locales) {
-        if (!(selectedLangIds.indexOf(LocaleUtil.toLanguageId(iiLocale))>=0) &&
-        		 automaticTranslatorUtil.canTranslateTo( LocaleUtil.toLanguageId(iiLocale).split("_")[0], articleLanguages) ) {
-            
-    %>
-        <div>
-	        <aui:input name="selectedLanguages" type="checkbox" inlineLabel="right" label="" value="<%=LocaleUtil.toLanguageId(iiLocale) %>"/>
-	        <liferay-ui:icon
-	            image='<%= "../language/" + LocaleUtil.toLanguageId(iiLocale) %>'
-	            message="<%= iiLocale.getDisplayName(locale) %>"
-	        />
-	        <span class="lfr-icon-menu-text"><%= iiLocale.getDisplayName(locale) %></span>
-        </div>
-    <%
-        }
-    }
-    %>
-    
-		<aui:button-row>
-			<aui:button name="saveButton" type="submit" value="continue" disabled="<%= disable %>" />
-		    <aui:button href="<%= redirect %>" type="cancel" />
-		</aui:button-row>
-		<span>Powered by <a href="http://translate.yandex.com/">Yandex.Translate</a></span>
-    </aui:field-wrapper>
-</aui:form>
-
-<% if(close) {  %>
-<aui:script use="aui-base">
-	Liferay.fire('closeWindow',
-	{
-		id: '<portlet:namespace/>automatic-translate',
-		redirect: '<%= HtmlUtil.escapeJS(redirect) %>'
-	});
-</aui:script>
+<% if(!automaticTranslatorUtil.validateCredentials()) { %>
+	<liferay-ui:message key="translator-no-yandex-api" />
+<% } else { %>
+	<portlet:actionURL var="translateArticleActionURL" name="automaticTranslate" windowState="<%= WindowState.MAXIMIZED.toString() %>">
+		<portlet:param name="articleId" value="<%=articleId%>" />
+		<portlet:param name="groupId" value="<%=String.valueOf(groupId)%>" />
+		<portlet:param name="version" value="<%=String.valueOf(version)%>" />
+	</portlet:actionURL>
+	
+	<liferay-ui:error key="translator-error" message="translator-error-message"/>
+	<liferay-ui:error key="translator-auth-error" message="translator-auth-error-message"/>
+	
+	<aui:form action="<%= translateArticleActionURL %>" cssClass="lfr-dynamic-form" enctype="multipart/form-data" method="post" name="fm1">
+	    <aui:input name="articleId" type="hidden" value="<%= articleId %>" />
+	    <aui:input name="groupId" type="hidden" value="<%= groupId %>" />
+	    <aui:input name="version" type="hidden" value="<%= ((article == null) || article.isNew()) ? version : article.getVersion() %>" />
+	    <aui:input name="status" type="hidden" value="<%= status %>" />
+	    <aui:input name="structureId" type="hidden" value="<%= structureId %>" />
+	    
+	    <aui:field-wrapper name="selectedLanguages" label="journal.article.form.translate.select.language">
+	    <%
+	    Set<Locale> locales = LanguageUtil.getAvailableLocales(themeDisplay.getSiteGroupId());
+	    
+	    for (Locale iiLocale : locales) {
+	        if (!(selectedLangIds.indexOf(LocaleUtil.toLanguageId(iiLocale))>=0) &&
+	        		 automaticTranslatorUtil.canTranslateTo( LocaleUtil.toLanguageId(iiLocale).split("_")[0], articleLanguages) ) {
+	            
+	    %>
+	        <div>
+		        <aui:input name="selectedLanguages" type="checkbox" inlineLabel="right" label="" value="<%=LocaleUtil.toLanguageId(iiLocale) %>"/>
+		        <liferay-ui:icon
+		            image='<%= "../language/" + LocaleUtil.toLanguageId(iiLocale) %>'
+		            message="<%= iiLocale.getDisplayName(locale) %>"
+		        />
+		        <span class="lfr-icon-menu-text"><%= iiLocale.getDisplayName(locale) %></span>
+	        </div>
+	    <%
+	        }
+	    }
+	    %>
+	    
+			<aui:button-row>
+				<aui:button name="saveButton" type="submit" value="continue" disabled="<%= disable %>" />
+			    <aui:button href="<%= redirect %>" type="cancel" />
+			</aui:button-row>
+			<span>Powered by <a href="http://translate.yandex.com/">Yandex.Translate</a></span>
+	    </aui:field-wrapper>
+	</aui:form>
+	
+	<% if(close) {  %>
+	<aui:script use="aui-base">
+		Liferay.fire('closeWindow',
+		{
+			id: '<portlet:namespace/>automatic-translate',
+			redirect: '<%= HtmlUtil.escapeJS(redirect) %>'
+		});
+	</aui:script>
+	<% } %>
 <% } %>
