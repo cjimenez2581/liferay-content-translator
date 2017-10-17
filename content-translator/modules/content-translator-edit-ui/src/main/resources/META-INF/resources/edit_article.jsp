@@ -384,30 +384,30 @@ request.setAttribute("edit_article.jsp-changeStructure", changeStructure);
 	
 	var automaticTranslationBtn= A.one(".automatic-translation-btn");
 	automaticTranslationBtn.on('click', function(){
-		
-	var selectedLangIds='';
-	A.all('.lfr-translation-manager-translation').each(
-	  function (node) {
-	    if (node.getAttribute('locale') !== "") {
-	    	selectedLangIds = selectedLangIds+node.getAttribute('locale')+",";
-	    }
-	  }
-	);
-	console.log("selected Lang ->" + selectedLangIds);
-	new Liferay.Util.openWindow(
-		{
-		cache: false,
-		dialog:{
-			width: 350,
-			height: 450,
-			on: {
-				visibleChange: function(e) { if(!e.newVal) window.location.reload(); }
+		var selectedLangIds='';
+		A.all('.lfr-translation-manager-translation').each(function (node) {
+		  if (node.getAttribute('locale') !== "") {
+		  	selectedLangIds = selectedLangIds+node.getAttribute('locale')+",";
+		  }
+	    });
+		Liferay.Util.openWindow({
+			cache: false,
+			dialog:{
+				destroyOnHide: true,
+				width: 350,
+				height: 450,
+				on: {
+					visibleChange: function(e) {
+						if(!e.newVal){
+							setTimeout(function(){window.location.reload(); }, 1); // Timeout so it doesn't block the window
+						}
+					}
+				},
 			},
-		},
-		id: '<portlet:namespace/>automatic-translate',
-		title: '<%=HtmlUtil.escapeJS( LanguageUtil.get(request, "web-content-translation") )%>',
-		uri: '${translateArticleRenderPopUpURL}'+'&<portlet:namespace/>selectedLangIds='+selectedLangIds, 
-	});
+			id: '<portlet:namespace/>automatic-translate',
+			title: '<%=HtmlUtil.escapeJS( LanguageUtil.get(request, "web-content-translation") )%>',
+			uri: '${translateArticleRenderPopUpURL}'+'&<portlet:namespace/>selectedLangIds='+selectedLangIds, 
+		});
 	});
 	
 	<!-- Rivet customization end -->
