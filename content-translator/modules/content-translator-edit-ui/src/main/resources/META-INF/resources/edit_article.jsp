@@ -176,15 +176,18 @@ request.setAttribute("edit_article.jsp-changeStructure", changeStructure);
 	<%
 	DDMFormValues ddmFormValues = journalDisplayContext.getDDMFormValues(ddmStructure);
 
-	Locale[] availableLocales = new Locale[] {LocaleUtil.fromLanguageId(defaultLanguageId)};
+	Set<Locale> availableLocalesSet = new HashSet<>();
+
+	availableLocalesSet.add(LocaleUtil.fromLanguageId(defaultLanguageId));
+	availableLocalesSet.addAll(journalDisplayContext.getAvailableArticleLocales());
 
 	if (ddmFormValues != null) {
-		Set<Locale> availableLocalesSet = ddmFormValues.getAvailableLocales();
-
-		availableLocales = availableLocalesSet.toArray(new Locale[availableLocalesSet.size()]);
+		availableLocalesSet.addAll(ddmFormValues.getAvailableLocales());
 	}
+
+	Locale[] availableLocales = availableLocalesSet.toArray(new Locale[availableLocalesSet.size()]);
 	%>
-	
+
 	<div class="lfr-form-content">
 		<liferay-ui:error exception="<%= ArticleContentSizeException.class %>" message="you-have-exceeded-the-maximum-web-content-size-allowed" />
 		<liferay-ui:error exception="<%= DuplicateFileEntryException.class %>" message="a-file-with-that-name-already-exists" />
@@ -212,14 +215,8 @@ request.setAttribute("edit_article.jsp-changeStructure", changeStructure);
 			</liferay-frontend:info-bar>
 		</c:if>
 
-		<aui:translation-manager
-			availableLocales="<%= availableLocales %>"
-			changeableDefaultLanguage="<%= changeableDefaultLanguage %>"
-			defaultLanguageId="<%= defaultLanguageId %>"
-			id="translationManager"
-		/>
-		
-		<!-- Rivet customization start -->
+		<aui:translation-manager availableLocales="<%= availableLocales %>" changeableDefaultLanguage="<%= changeableDefaultLanguage %>" defaultLanguageId="<%= defaultLanguageId %>" id="translationManager" />
+<!-- Rivet customization start -->
 		
 		<portlet:renderURL var="translateArticleRenderPopUpURL" windowState="<%=LiferayWindowState.POP_UP.toString()%>">
 			<portlet:param name="mvcPath" value="/content-translator/translate.jsp" />
@@ -229,53 +226,26 @@ request.setAttribute("edit_article.jsp-changeStructure", changeStructure);
 			<portlet:param name="redirect" value="<%=currentURL%>" />
 		</portlet:renderURL>
 		
-		<%
-		/*	String taglibEditURL = "javascript:Liferay.Util.openWindow({"+
-				"cache: false,"+
-				"dialog:{" +
-					"width: 350," +
-					"height: 450," +
-					"on: {" +
-						"visibleChange: function(e) { if(!e.newVal) window.location.reload(); }," +
-					"}," +
-				"},"+
-				"id: '" + renderResponse.getNamespace() + "automatic-translate',"+
-				"title: '" + HtmlUtil.escapeJS( LanguageUtil.get(request, "web-content-translation") ) + "'," +
-				"uri: '" + HtmlUtil.escapeJS( translateArticleRenderPopUpURL ) + "'," +
-			"});";  */
-		%>
-		
-		<aui:button icon="icon-plus"
+		<aui:button icon="icon-plus" disabled="<%=article == null %>"
 			name="addAutomaticTranslation"
 			value="<%=LanguageUtil.get(request, "add-automatic-translation")%>"
 			cssClass="automatic-translation-btn" />
-
-		<!-- Rivet customization end -->
-
+<!-- Rivet customization end -->
 		<%
-			boolean approved = false;
-				boolean pending = false;
+		boolean approved = false;
+		boolean pending = false;
 
-				long inheritedWorkflowDDMStructuresFolderId = JournalFolderLocalServiceUtil
-						.getInheritedWorkflowFolderId(folderId);
+		long inheritedWorkflowDDMStructuresFolderId = JournalFolderLocalServiceUtil.getInheritedWorkflowFolderId(folderId);
 
-				boolean workflowEnabled = WorkflowDefinitionLinkLocalServiceUtil.hasWorkflowDefinitionLink(
-						themeDisplay.getCompanyId(), groupId, JournalFolder.class.getName(), folderId,
-						ddmStructure.getStructureId())
-						|| WorkflowDefinitionLinkLocalServiceUtil.hasWorkflowDefinitionLink(themeDisplay.getCompanyId(),
-								groupId, JournalFolder.class.getName(), inheritedWorkflowDDMStructuresFolderId,
-								ddmStructure.getStructureId())
-						|| WorkflowDefinitionLinkLocalServiceUtil.hasWorkflowDefinitionLink(themeDisplay.getCompanyId(),
-								groupId, JournalFolder.class.getName(), inheritedWorkflowDDMStructuresFolderId,
-								JournalArticleConstants.DDM_STRUCTURE_ID_ALL);
+		boolean workflowEnabled = WorkflowDefinitionLinkLocalServiceUtil.hasWorkflowDefinitionLink(themeDisplay.getCompanyId(), groupId, JournalFolder.class.getName(), folderId, ddmStructure.getStructureId()) || WorkflowDefinitionLinkLocalServiceUtil.hasWorkflowDefinitionLink(themeDisplay.getCompanyId(), groupId, JournalFolder.class.getName(), inheritedWorkflowDDMStructuresFolderId, ddmStructure.getStructureId()) || WorkflowDefinitionLinkLocalServiceUtil.hasWorkflowDefinitionLink(themeDisplay.getCompanyId(), groupId, JournalFolder.class.getName(), inheritedWorkflowDDMStructuresFolderId, JournalArticleConstants.DDM_STRUCTURE_ID_ALL);
 
-				if ((article != null) && (version > 0)) {
-					approved = article.isApproved();
+		if ((article != null) && (version > 0)) {
+			approved = article.isApproved();
 
-					if (workflowEnabled) {
-						pending = article.isPending();
-					}
-				}
+			if (workflowEnabled) {
+				pending = article.isPending();
+			}
+		}
 		%>
 
 		<c:if test="<%= classNameId == JournalArticleConstants.CLASSNAME_ID_DEFAULT %>">
@@ -361,7 +331,9 @@ request.setAttribute("edit_article.jsp-changeStructure", changeStructure);
 	<portlet:param name="version" value="<%= String.valueOf(version) %>" />
 </portlet:renderURL>
 
-<aui:script use="liferay-portlet-journal">
+<!-- Rivet customization start -->
+<aui:script use="liferay-portlet-journal, aui-tooltip">
+<!-- Rivet customization end -->
 	new Liferay.Portlet.Journal(
 		{
 			article: {
@@ -379,37 +351,36 @@ request.setAttribute("edit_article.jsp-changeStructure", changeStructure);
 			'strings.saveAsDraftBeforePreview': '<liferay-ui:message key="in-order-to-preview-your-changes,-the-web-content-is-saved-as-a-draft" />'
 		}
 	);
-	
-	<!-- Rivet customization start -->
-	
-	var automaticTranslationBtn= A.one(".automatic-translation-btn");
-	automaticTranslationBtn.on('click', function(){
-		var selectedLangIds='';
-		A.all('.lfr-translation-manager-translation').each(function (node) {
-		  if (node.getAttribute('locale') !== "") {
-		  	selectedLangIds = selectedLangIds+node.getAttribute('locale')+",";
-		  }
-	    });
-		Liferay.Util.openWindow({
-			cache: false,
-			dialog:{
-				destroyOnHide: true,
-				width: 350,
-				height: 450,
-				on: {
-					visibleChange: function(e) {
-						if(!e.newVal){
-							setTimeout(function(){window.location.reload(); }, 1); // Timeout so it doesn't block the window
+<!-- Rivet customization start -->
+	if('<%=article != null%>'){
+		var automaticTranslationBtn= A.one(".automatic-translation-btn");
+		automaticTranslationBtn.on('click', function(){
+			var selectedLangIds='';
+			A.all('.lfr-translation-manager-translation').each(function (node) {
+			  if (node.getAttribute('locale') !== "") {
+			  	selectedLangIds = selectedLangIds+node.getAttribute('locale')+",";
+			  }
+		    });
+			Liferay.Util.openWindow({
+				cache: false,
+				dialog:{
+					destroyOnHide: true,
+					width: 350,
+					height: 450,
+					on: {
+						visibleChange: function(e) {
+							if(!e.newVal){
+								
+								setTimeout(function(){window.location.reload(); }, 1); // Timeout so it doesn't block the window
+							}
 						}
-					}
+					},
 				},
-			},
-			id: '<portlet:namespace/>automatic-translate',
-			title: '<%=HtmlUtil.escapeJS( LanguageUtil.get(request, "web-content-translation") )%>',
-			uri: '${translateArticleRenderPopUpURL}'+'&<portlet:namespace/>selectedLangIds='+selectedLangIds, 
+				id: '<portlet:namespace/>automatic-translate',
+				title: '<%=HtmlUtil.escapeJS( LanguageUtil.get(request, "web-content-translation") )%>',
+				uri: '${translateArticleRenderPopUpURL}'+'&<portlet:namespace/>selectedLangIds='+selectedLangIds, 
+			});
 		});
-	});
-	
-	<!-- Rivet customization end -->
-	
+	}
+<!-- Rivet customization end -->
 </aui:script>

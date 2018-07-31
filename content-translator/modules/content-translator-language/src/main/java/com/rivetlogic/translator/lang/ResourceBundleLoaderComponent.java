@@ -1,14 +1,15 @@
 package com.rivetlogic.translator.lang;
 
-import java.util.ResourceBundle;
-
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 import com.liferay.portal.kernel.util.AggregateResourceBundleLoader;
 import com.liferay.portal.kernel.util.CacheResourceBundleLoader;
 import com.liferay.portal.kernel.util.ClassResourceBundleLoader;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
+
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 @Component(
 		immediate = true,
@@ -24,6 +25,11 @@ public class ResourceBundleLoaderComponent implements ResourceBundleLoader {
 	public ResourceBundle loadResourceBundle(String languageId) {
 		return _resourceBundleLoader.loadResourceBundle(languageId);
 	}
+	
+	public ResourceBundle loadResourceBundle(Locale locale) {
+		 return _resourceBundleLoader.loadResourceBundle(locale.toString());
+	}
+
 
 	@Reference(target = "(&(bundle.symbolic.name=com.liferay.journal.lang)(!(component.name=com.rivetlogic.translator.lang.ResourceBundleLoaderComponent)))")
 	public void setResourceBundleLoader(

@@ -14,5 +14,6 @@ dependencies {
 	compileInclude group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
 	compileInclude group: 'com.google.guava', name: 'guava', version: '22.0'
 	
+	compile group: 'org.apache.avalon.framework', name: 'avalon-framework-api', version: '4.3.1'
 	testCompile "junit:junit:4.11"
 }
